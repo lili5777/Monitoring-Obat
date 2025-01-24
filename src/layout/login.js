@@ -6,16 +6,26 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Modal,
+  Pressable,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import {useNavigation} from '@react-navigation/native';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   const handleLogin = () => {
-    console.log('Username:', username);
-    console.log('Password:', password);
+    if (username === 'lili' && password === '123') {
+      // Arahkan ke halaman home.js
+      navigation.navigate('Home');
+    } else {
+      // Tampilkan modal error
+      setModalVisible(true);
+    }
   };
 
   return (
@@ -51,6 +61,26 @@ const Login = () => {
       <Text style={styles.footerText}>
         Don’t have an account? <Text style={styles.signupText}>Sign up</Text>
       </Text>
+
+      {/* Modal untuk Error */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>
+              Username atau password yang Anda masukkan salah.
+            </Text>
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.modalButtonText}>OK</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 };
@@ -133,6 +163,38 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    elevation: 10,
+    width: '80%',
+    maxWidth: 300,
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#000',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#ff3952',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 
