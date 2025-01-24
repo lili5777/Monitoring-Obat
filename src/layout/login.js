@@ -11,6 +11,9 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
+import axios from 'axios';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import Home from './home';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -18,13 +21,19 @@ const Login = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    if (username === 'lili' && password === '123') {
-      // Arahkan ke halaman home.js
-      navigation.navigate('Home');
-    } else {
-      // Tampilkan modal error
-      setModalVisible(true);
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://10.0.2.2:8000/api/login', {
+        username: username,
+        password: password,
+      });
+      if (response.status === 200) {
+        // const {role} = response.data.user;
+        // await AsyncStorage.setItem('userRole', role);
+        navigation.navigate(Home);
+      }
+    } catch (error) {
+      setModalVisible(true); // Tampilkan modal error
     }
   };
 
