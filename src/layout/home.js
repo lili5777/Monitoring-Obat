@@ -1,13 +1,35 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text, View, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
 
 const Home = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const navigation = useNavigation();
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('user');
+    navigation.navigate('Login'); // Arahkan ke halaman login
+  };
+
   return (
     <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hi Jenifer!</Text>
-        <Text style={styles.role}>You are an admin</Text>
+        <Text style={styles.greeting}>Hi {user ? user.username : 'User'}!</Text>
+        <Text style={styles.role}>
+          You are an {user ? user.username : 'User'}
+        </Text>
       </View>
 
       <View style={styles.card}>
@@ -51,7 +73,7 @@ const Home = () => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logoutButton}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </LinearGradient>

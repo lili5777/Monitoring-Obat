@@ -12,7 +12,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './home';
 
 const Login = () => {
@@ -28,12 +28,11 @@ const Login = () => {
         password: password,
       });
       if (response.status === 200) {
-        // const {role} = response.data.user;
-        // await AsyncStorage.setItem('userRole', role);
+        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
         navigation.navigate(Home);
       }
     } catch (error) {
-      setModalVisible(true); // Tampilkan modal error
+      setModalVisible(true);
     }
   };
 
