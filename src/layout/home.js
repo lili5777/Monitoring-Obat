@@ -25,6 +25,15 @@ const Home = () => {
   const handleRak = async () => {
     navigation.navigate('Rak'); // Arahkan ke halaman login
   };
+  const handleObat = async () => {
+    navigation.navigate('Obat'); // Arahkan ke halaman login
+  };
+  const handleRiwayat = async () => {
+    navigation.navigate('Riwayat'); // Arahkan ke halaman login
+  };
+  const handleProfil = async () => {
+    navigation.navigate('Profil'); // Arahkan ke halaman login
+  };
 
   return (
     <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}>
@@ -47,7 +56,7 @@ const Home = () => {
       </View>
 
       <View style={styles.menuContainer}>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={handleObat}>
           <Image source={require('../img/obat.png')} style={styles.menuIcon} />
           <Text style={styles.menuText}>Obat</Text>
         </TouchableOpacity>
@@ -58,14 +67,14 @@ const Home = () => {
           />
           <Text style={styles.menuText}>Kelola Rak</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={handleRiwayat}>
           <Image
             source={require('../img/expire.png')}
             style={styles.menuIcon}
           />
           <Text style={styles.menuText}>Riwayat</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={handleProfil}>
           <Image
             source={require('../img/profile.png')}
             style={styles.menuIcon}
