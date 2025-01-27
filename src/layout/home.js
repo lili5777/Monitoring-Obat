@@ -22,14 +22,15 @@ const Home = () => {
     await AsyncStorage.removeItem('user');
     navigation.navigate('Login'); // Arahkan ke halaman login
   };
+  const handleRak = async () => {
+    navigation.navigate('Rak'); // Arahkan ke halaman login
+  };
 
   return (
     <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.greeting}>Hi {user ? user.username : 'User'}!</Text>
-        <Text style={styles.role}>
-          You are an {user ? user.username : 'User'}
-        </Text>
+        <Text style={styles.role}>You are an {user ? user.role : 'User'}</Text>
       </View>
 
       <View style={styles.card}>
@@ -50,7 +51,7 @@ const Home = () => {
           <Image source={require('../img/obat.png')} style={styles.menuIcon} />
           <Text style={styles.menuText}>Obat</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={handleRak}>
           <Image
             source={require('../img/manage3.png')}
             style={styles.menuIcon}
