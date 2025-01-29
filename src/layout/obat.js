@@ -76,7 +76,7 @@ const Obat = () => {
         if (data.success) {
           const obatBaru = {
             id: data.data.id,
-            nama: data.data.nama, // Pastikan menggunakan nama yang sesuai
+            nama: data.data.nama,
             jumlah: data.data.jumlah,
             kadaluarsa: data.data.kadaluarsa,
             rak: data.data.rak,
