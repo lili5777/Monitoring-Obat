@@ -160,6 +160,47 @@ const Obat = () => {
       });
   };
 
+  const handleDeleteObat = id => {
+    Alert.alert(
+      'Konfirmasi Hapus',
+      'Apakah Anda yakin ingin menghapus obat ini?',
+      [
+        {
+          text: 'Batal',
+          style: 'cancel',
+        },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: () => {
+            fetch(`http://10.0.2.2:8000/api/deleteobat/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  setObatData(prevData =>
+                    prevData.filter(item => item.id !== id),
+                  );
+                  Alert.alert('Success', 'Obat berhasil dihapus!');
+                } else {
+                  Alert.alert('Error', data.message || 'Gagal menghapus obat!');
+                }
+              })
+              .catch(error => {
+                console.error('Error deleting obat:', error);
+                Alert.alert('Error', 'Terjadi kesalahan saat menghapus obat!');
+              });
+          },
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || kadaluarsa;
     setShowDatePicker(false);
@@ -198,6 +239,12 @@ const Obat = () => {
                   onPress={() => openEditModal(item)}
                   style={styles.editButton}>
                   Edit
+                </Button>
+                <Button
+                  mode="contained"
+                  onPress={() => handleDeleteObat(item.id)}
+                  style={styles.deleteButton}>
+                  Hapus
                 </Button>
               </Card.Content>
             </Card>
@@ -380,9 +427,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
   editButton: {
     backgroundColor: '#4CAF50',
-    marginTop: 10,
+    flex: 1,
+    marginRight: 5,
+  },
+  deleteButton: {
+    backgroundColor: '#f44336',
+    flex: 1,
+    marginLeft: 5,
   },
   addButtonText: {
     color: '#ff3952',
