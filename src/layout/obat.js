@@ -28,6 +28,12 @@ const Obat = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [idRak, setIdRak] = useState('');
   const navigation = useNavigation();
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editObatId, setEditObatId] = useState(null);
+  const [editNamaObat, setEditNamaObat] = useState('');
+  const [editJumlah, setEditJumlah] = useState('');
+  const [editKadaluarsa, setEditKadaluarsa] = useState('');
+  const [editIdRak, setEditIdRak] = useState('');
 
   useEffect(() => {
     fetch('http://10.0.2.2:8000/api/obat')
@@ -98,11 +104,67 @@ const Obat = () => {
       });
   };
 
+  const openEditModal = item => {
+    setEditObatId(item.id);
+    setEditNamaObat(item.nama);
+    setEditJumlah(item.jumlah.toString());
+    setEditKadaluarsa(item.kadaluarsa);
+    setEditIdRak(rakData.find(rak => rak.nama_rak === item.rak)?.id || '');
+    setEditModalVisible(true);
+  };
+
+  const handleUpdateObat = () => {
+    if (!editNamaObat || !editJumlah || !editKadaluarsa || !editIdRak) {
+      Alert.alert('Error', 'Semua field harus diisi!');
+      return;
+    }
+
+    const updatedObat = {
+      nama_obat: editNamaObat,
+      jumlah: editJumlah,
+      kadaluarsa: editKadaluarsa,
+      id_rak: editIdRak,
+    };
+
+    fetch(`http://10.0.2.2:8000/api/updateobat/${editObatId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedObat),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const updatedData = obatData.map(item =>
+            item.id === editObatId
+              ? {
+                  ...item,
+                  nama: data.data.nama,
+                  jumlah: data.data.jumlah,
+                  kadaluarsa: data.data.kadaluarsa,
+                  rak: data.data.rak,
+                }
+              : item,
+          );
+          setObatData(updatedData);
+          setEditModalVisible(false);
+          Alert.alert('Success', 'Obat berhasil diperbarui!');
+        } else {
+          Alert.alert('Error', data.message || 'Gagal memperbarui obat!');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating obat:', error);
+        Alert.alert('Error', 'Terjadi kesalahan saat memperbarui obat!');
+      });
+  };
+
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || kadaluarsa;
-    setShowDatePicker(false); // Hide date picker after selection
+    setShowDatePicker(false);
     if (event.type === 'set') {
-      setKadaluarsa(currentDate.toISOString().split('T')[0]); // Format to YYYY-MM-DD
+      setKadaluarsa(currentDate.toISOString().split('T')[0]);
     }
   };
 
@@ -131,6 +193,12 @@ const Obat = () => {
                   Kadaluarsa: {item.kadaluarsa}
                 </Text>
                 <Text style={styles.cardSubtitle}>Rak: {item.rak}</Text>
+                <Button
+                  mode="contained"
+                  onPress={() => openEditModal(item)}
+                  style={styles.editButton}>
+                  Edit
+                </Button>
               </Card.Content>
             </Card>
           )}
@@ -209,6 +277,83 @@ const Obat = () => {
           </View>
         </View>
       </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={editModalVisible}
+        onRequestClose={() => setEditModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <KeyboardAvoidingView>
+              <Text style={styles.modalTitle}>Edit Obat</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Nama Obat"
+                value={editNamaObat}
+                onChangeText={setEditNamaObat}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Jumlah"
+                value={editJumlah}
+                onChangeText={setEditJumlah}
+                keyboardType="numeric"
+              />
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+                style={styles.inputDate}>
+                <Text
+                  style={
+                    editKadaluarsa
+                      ? styles.dateSelected
+                      : styles.datePlaceholder
+                  }>
+                  {editKadaluarsa || 'Pilih Tanggal Kadaluarsa'}
+                </Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={editKadaluarsa ? new Date(editKadaluarsa) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    const currentDate = selectedDate || editKadaluarsa;
+                    setShowDatePicker(false);
+                    if (event.type === 'set') {
+                      setEditKadaluarsa(
+                        currentDate.toISOString().split('T')[0],
+                      );
+                    }
+                  }}
+                />
+              )}
+              <Picker
+                selectedValue={editIdRak}
+                onValueChange={itemValue => setEditIdRak(itemValue)}
+                style={styles.picker}>
+                <Picker.Item label="Pilih Rak" value="" />
+                {rakData.map(rak => (
+                  <Picker.Item
+                    key={rak.id}
+                    label={rak.nama_rak}
+                    value={rak.id}
+                  />
+                ))}
+              </Picker>
+              <Button
+                mode="contained"
+                onPress={handleUpdateObat}
+                style={styles.submitButton}>
+                Simpan Perubahan
+              </Button>
+              <Button mode="text" onPress={() => setEditModalVisible(false)}>
+                Batal
+              </Button>
+            </KeyboardAvoidingView>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 };
@@ -234,6 +379,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 10,
+  },
+  editButton: {
+    backgroundColor: '#4CAF50',
+    marginTop: 10,
   },
   addButtonText: {
     color: '#ff3952',
