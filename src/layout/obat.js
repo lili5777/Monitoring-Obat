@@ -13,8 +13,6 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {ActivityIndicator, Button} from 'react-native-paper';
-import {Picker} from '@react-native-picker/picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 const Obat = () => {
   const [obatData, setObatData] = useState([]);
@@ -90,7 +88,7 @@ const Obat = () => {
 
   const openEditModal = item => {
     setEditObatId(item.id);
-    setEditNamaObat(item.nama);
+    setEditNamaObat(item.nama_obat);
     setEditKodeObat(item.kode);
     setEditModalVisible(true);
   };
@@ -103,7 +101,7 @@ const Obat = () => {
 
     const updatedObat = {
       nama_obat: editNamaObat,
-      jumlah: editKodeObat,
+      kode: editKodeObat,
     };
 
     fetch(`http://10.0.2.2:8000/api/updateobat/${editObatId}`, {
@@ -120,7 +118,7 @@ const Obat = () => {
             item.id === editObatId
               ? {
                   ...item,
-                  nama: data.data.nama,
+                  nama: data.data.nama_obat,
                   kode: data.data.kode,
                 }
               : item,
@@ -182,7 +180,6 @@ const Obat = () => {
   };
 
   return (
-    // <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}>
     <View style={styles.container}>
       <View style={styles.head}>
         <View>
@@ -273,7 +270,7 @@ const Obat = () => {
         </View>
       </Modal>
 
-      {/* <Modal
+      <Modal
         animationType="slide"
         transparent={true}
         visible={editModalVisible}
@@ -290,52 +287,11 @@ const Obat = () => {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Jumlah"
-                value={editJumlah}
-                onChangeText={setEditJumlah}
+                placeholder="Kode"
+                value={editKodeObat}
+                onChangeText={setEditKodeObat}
                 keyboardType="numeric"
               />
-              <TouchableOpacity
-                onPress={() => setShowDatePicker(true)}
-                style={styles.inputDate}>
-                <Text
-                  style={
-                    editKadaluarsa
-                      ? styles.dateSelected
-                      : styles.datePlaceholder
-                  }>
-                  {editKadaluarsa || 'Pilih Tanggal Kadaluarsa'}
-                </Text>
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={editKadaluarsa ? new Date(editKadaluarsa) : new Date()}
-                  mode="date"
-                  display="default"
-                  onChange={(event, selectedDate) => {
-                    const currentDate = selectedDate || editKadaluarsa;
-                    setShowDatePicker(false);
-                    if (event.type === 'set') {
-                      setEditKadaluarsa(
-                        currentDate.toISOString().split('T')[0],
-                      );
-                    }
-                  }}
-                />
-              )}
-              <Picker
-                selectedValue={editIdRak}
-                onValueChange={itemValue => setEditIdRak(itemValue)}
-                style={styles.picker}>
-                <Picker.Item label="Pilih Rak" value="" />
-                {rakData.map(rak => (
-                  <Picker.Item
-                    key={rak.id}
-                    label={rak.nama_rak}
-                    value={rak.id}
-                  />
-                ))}
-              </Picker>
               <Button
                 mode="contained"
                 onPress={handleUpdateObat}
@@ -348,14 +304,12 @@ const Obat = () => {
             </KeyboardAvoidingView>
           </View>
         </View>
-      </Modal> */}
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // picker: {borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10},
-  // selectContainer: {margin: 10},
   container: {
     flex: 1,
     padding: 20,
@@ -478,7 +432,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: 10,
-    backgroundColor: '#007bff', // Adjust the color as needed
+    backgroundColor: '#ff3952', // Adjust the color as needed
   },
 });
 
