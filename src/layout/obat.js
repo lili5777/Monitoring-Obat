@@ -207,24 +207,29 @@ const Obat = () => {
           data={obatData}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item}) => (
-            <View style={styles.listt}>
-              <View style={styles.tekss}>
-                <Text style={styles.cardTitle}>Kode : {item.kode}</Text>
-                <Text style={styles.cardSubtitle}>Nama : {item.nama_obat}</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Transaksi', {id: item.id})}>
+              <View style={styles.listt}>
+                <View style={styles.tekss}>
+                  <Text style={styles.cardTitle}>Kode : {item.kode}</Text>
+                  <Text style={styles.cardSubtitle}>
+                    Nama : {item.nama_obat}
+                  </Text>
+                </View>
+                <View style={styles.buttons}>
+                  <TouchableOpacity
+                    onPress={() => openEditModal(item)}
+                    style={styles.buttonn}>
+                    <Text style={styles.buttonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteObat(item.id)}
+                    style={[styles.buttonn, {backgroundColor: '#dc3545'}]}>
+                    <Text style={styles.buttonText}>Hapus</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.buttons}>
-                <TouchableOpacity
-                  onPress={() => openEditModal(item)}
-                  style={styles.buttonn}>
-                  <Text style={styles.buttonText}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDeleteObat(item.id)}
-                  style={[styles.buttonn, {backgroundColor: '#dc3545'}]}>
-                  <Text style={styles.buttonText}>Hapus</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}

@@ -8,6 +8,7 @@ import Rak from './src/layout/rak';
 import Profil from './src/layout/profil';
 import Obat from './src/layout/obat';
 import Riwayat from './src/layout/riwayat';
+import Transaksi from './src/layout/transaksi';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,7 @@ const App = () => {
         <Stack.Screen name="Profil" component={Profil} />
         <Stack.Screen name="Obat" component={Obat} />
         <Stack.Screen name="Riwayat" component={Riwayat} />
+        <Stack.Screen name="Transaksi" component={Transaksi} />
       </Stack.Navigator>
     </NavigationContainer>
   );
