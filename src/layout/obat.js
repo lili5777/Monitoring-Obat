@@ -8,38 +8,35 @@ import {
   Modal,
   TextInput,
   Alert,
-  Platform,
   KeyboardAvoidingView,
+  Image,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {Card, ActivityIndicator, Button} from 'react-native-paper';
-import LinearGradient from 'react-native-linear-gradient';
+import {ActivityIndicator, Button} from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const Obat = () => {
   const [obatData, setObatData] = useState([]);
-  const [rakData, setRakData] = useState([]);
+  const [obatTotal, setObatTotal] = useState([]);
+  const [obatJumlah, setObatJumlah] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [namaObat, setNamaObat] = useState('');
-  const [jumlah, setJumlah] = useState('');
-  const [kadaluarsa, setKadaluarsa] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [idRak, setIdRak] = useState('');
+  const [kodeObat, setKodeObat] = useState('');
   const navigation = useNavigation();
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editObatId, setEditObatId] = useState(null);
   const [editNamaObat, setEditNamaObat] = useState('');
-  const [editJumlah, setEditJumlah] = useState('');
-  const [editKadaluarsa, setEditKadaluarsa] = useState('');
-  const [editIdRak, setEditIdRak] = useState('');
+  const [editKodeObat, setEditKodeObat] = useState('');
 
   useEffect(() => {
     fetch('http://10.0.2.2:8000/api/obat')
       .then(response => response.json())
       .then(data => {
         setObatData(data.obat || []);
+        setObatTotal(data.total || []);
+        setObatJumlah(data.jum || []);
         setLoading(false);
       })
       .catch(error => {
@@ -49,16 +46,14 @@ const Obat = () => {
   }, []);
 
   const handleAddObat = () => {
-    if (!namaObat || !jumlah || !kadaluarsa || !idRak) {
+    if (!namaObat || !kodeObat) {
       Alert.alert('Error', 'Semua field harus diisi!');
       return;
     }
 
     const newObat = {
       nama_obat: namaObat,
-      jumlah,
-      kadaluarsa,
-      id_rak: idRak,
+      kode: kodeObat,
     };
 
     fetch('http://10.0.2.2:8000/api/storeobat', {
@@ -73,17 +68,15 @@ const Obat = () => {
         if (data.success) {
           const obatBaru = {
             id: data.data.id,
-            nama: data.data.nama,
-            jumlah: data.data.jumlah,
-            kadaluarsa: data.data.kadaluarsa,
-            rak: data.data.rak,
+            nama_obat: data.data.nama_obat,
+            kode: data.data.kode,
           };
+          setObatTotal(data.total || []);
+          setObatJumlah(data.jum || []);
           setObatData(prevData => [...prevData, obatBaru]);
           setModalVisible(false);
           setNamaObat('');
-          setJumlah('');
-          setKadaluarsa('');
-          setIdRak('');
+          setKodeObat('');
           Alert.alert('Success', 'Obat berhasil ditambahkan!');
         } else {
           Alert.alert('Error', data.message || 'Gagal menambahkan obat!');
@@ -98,23 +91,19 @@ const Obat = () => {
   const openEditModal = item => {
     setEditObatId(item.id);
     setEditNamaObat(item.nama);
-    setEditJumlah(item.jumlah.toString());
-    setEditKadaluarsa(item.kadaluarsa);
-    setEditIdRak(rakData.find(rak => rak.nama_rak === item.rak)?.id || '');
+    setEditKodeObat(item.kode);
     setEditModalVisible(true);
   };
 
   const handleUpdateObat = () => {
-    if (!editNamaObat || !editJumlah || !editKadaluarsa || !editIdRak) {
+    if (!editNamaObat || !editKodeObat) {
       Alert.alert('Error', 'Semua field harus diisi!');
       return;
     }
 
     const updatedObat = {
       nama_obat: editNamaObat,
-      jumlah: editJumlah,
-      kadaluarsa: editKadaluarsa,
-      id_rak: editIdRak,
+      jumlah: editKodeObat,
     };
 
     fetch(`http://10.0.2.2:8000/api/updateobat/${editObatId}`, {
@@ -132,9 +121,7 @@ const Obat = () => {
               ? {
                   ...item,
                   nama: data.data.nama,
-                  jumlah: data.data.jumlah,
-                  kadaluarsa: data.data.kadaluarsa,
-                  rak: data.data.rak,
+                  kode: data.data.kode,
                 }
               : item,
           );
@@ -176,6 +163,8 @@ const Obat = () => {
                   setObatData(prevData =>
                     prevData.filter(item => item.id !== id),
                   );
+                  setObatTotal(data.total || []);
+                  setObatJumlah(data.jum || []);
                   Alert.alert('Success', 'Obat berhasil dihapus!');
                 } else {
                   Alert.alert('Error', data.message || 'Gagal menghapus obat!');
@@ -192,18 +181,22 @@ const Obat = () => {
     );
   };
 
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || kadaluarsa;
-    setShowDatePicker(false);
-    if (event.type === 'set') {
-      setKadaluarsa(currentDate.toISOString().split('T')[0]);
-    }
-  };
-
   return (
-    <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}>
-      <Text style={styles.title}>Data Obat</Text>
-
+    // <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.head}>
+        <View>
+          <Image source={require('../img/obat.png')} style={styles.obat} />
+        </View>
+        <View style={{justifyContent: 'center', marginLeft: 10, gap: 5}}>
+          <Text style={{color: '#ffff'}}>
+            Jenis Obat : <Text style={{fontWeight: '600'}}>{obatTotal}</Text>
+          </Text>
+          <Text style={{color: '#ffff'}}>
+            Total Obat : <Text style={{fontWeight: '600'}}>{obatJumlah}</Text>
+          </Text>
+        </View>
+      </View>
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         style={styles.addButton}>
@@ -225,12 +218,12 @@ const Obat = () => {
               <View style={styles.buttons}>
                 <TouchableOpacity
                   onPress={() => openEditModal(item)}
-                  style={styles.button}>
+                  style={styles.buttonn}>
                   <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => openEditModal(item)}
-                  style={[styles.button, {backgroundColor: '#dc3545'}]}>
+                  onPress={() => handleDeleteObat(item.id)}
+                  style={[styles.buttonn, {backgroundColor: '#dc3545'}]}>
                   <Text style={styles.buttonText}>Hapus</Text>
                 </TouchableOpacity>
               </View>
@@ -241,7 +234,7 @@ const Obat = () => {
 
       <TouchableOpacity
         onPress={() => navigation.navigate('Home')}
-        style={styles.button}>
+        style={styles.logoutButton}>
         <Text style={styles.buttonLabel}>Kembali ke Home</Text>
       </TouchableOpacity>
 
@@ -256,48 +249,16 @@ const Obat = () => {
               <Text style={styles.modalTitle}>Tambah Obat</Text>
               <TextInput
                 style={styles.input}
+                placeholder="Kode Obat"
+                value={kodeObat}
+                onChangeText={setKodeObat}
+              />
+              <TextInput
+                style={styles.input}
                 placeholder="Nama Obat"
                 value={namaObat}
                 onChangeText={setNamaObat}
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Jumlah"
-                value={jumlah}
-                onChangeText={setJumlah}
-                keyboardType="numeric"
-              />
-              <TouchableOpacity
-                onPress={() => setShowDatePicker(true)}
-                style={styles.inputDate}>
-                <Text
-                  style={
-                    kadaluarsa ? styles.dateSelected : styles.datePlaceholder
-                  }>
-                  {kadaluarsa || 'Pilih Tanggal Kadaluarsa'}
-                </Text>
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={kadaluarsa ? new Date(kadaluarsa) : new Date()}
-                  mode="date"
-                  display="default"
-                  onChange={onDateChange}
-                />
-              )}
-              <Picker
-                selectedValue={idRak}
-                onValueChange={itemValue => setIdRak(itemValue)}
-                style={styles.picker}>
-                <Picker.Item label="Pilih Rak" value="" />
-                {rakData.map(rak => (
-                  <Picker.Item
-                    key={rak.id}
-                    label={rak.nama_rak}
-                    value={rak.id}
-                  />
-                ))}
-              </Picker>
               <Button
                 mode="contained"
                 onPress={handleAddObat}
@@ -312,7 +273,7 @@ const Obat = () => {
         </View>
       </Modal>
 
-      <Modal
+      {/* <Modal
         animationType="slide"
         transparent={true}
         visible={editModalVisible}
@@ -387,8 +348,8 @@ const Obat = () => {
             </KeyboardAvoidingView>
           </View>
         </View>
-      </Modal>
-    </LinearGradient>
+      </Modal> */}
+    </View>
   );
 };
 
@@ -399,6 +360,18 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  head: {
+    flexDirection: 'row',
+    backgroundColor: '#ff3952',
+    padding: 20,
+    borderTopRightRadius: 30,
+    borderBottomLeftRadius: 30,
+    marginBottom: 10,
+  },
+  obat: {
+    width: 80,
+    height: 80,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -407,7 +380,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   addButton: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ffe5e5',
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 10,
@@ -434,12 +407,27 @@ const styles = StyleSheet.create({
     flex: 0.3,
     justifyContent: 'flex-end',
   },
-  button: {
+  buttonn: {
     marginHorizontal: 5,
     paddingVertical: 8,
     paddingHorizontal: 12,
     backgroundColor: '#007bff',
     borderRadius: 5,
+  },
+  logoutButton: {
+    backgroundColor: '#ff3952',
+    borderRadius: 20,
+    alignItems: 'center',
+    paddingVertical: 15,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  buttonLabel: {
+    color: '#fff',
   },
   buttonText: {
     color: '#fff',
@@ -457,6 +445,40 @@ const styles = StyleSheet.create({
     color: '#ff3952',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalContent: {
+    width: '80%', // Adjust the width as needed
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  submitButton: {
+    marginTop: 10,
+    backgroundColor: '#007bff', // Adjust the color as needed
   },
 });
 
