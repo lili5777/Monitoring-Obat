@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View, StyleSheet, Image, TouchableOpacity} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+// import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 
@@ -36,12 +36,12 @@ const Home = () => {
   };
 
   return (
-    <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}>
+    <View style={styles.container}>
+      {/* <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}> */}
       <View style={styles.header}>
         <Text style={styles.greeting}>Hi {user ? user.username : 'User'}!</Text>
         <Text style={styles.role}>You are an {user ? user.role : 'User'}</Text>
       </View>
-
       <View style={styles.card}>
         <View style={styles.cardContent}>
           <Text style={styles.cardTitle}>Welcome!</Text>
@@ -54,7 +54,6 @@ const Home = () => {
           style={styles.cardImage}
         />
       </View>
-
       <View style={styles.menuContainer}>
         <TouchableOpacity style={styles.menuItem} onPress={handleObat}>
           <Image source={require('../img/obat.png')} style={styles.menuIcon} />
@@ -82,11 +81,11 @@ const Home = () => {
           <Text style={styles.menuText}>Profile</Text>
         </TouchableOpacity>
       </View>
-
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
-    </LinearGradient>
+      {/* </LinearGradient> */}
+    </View>
   );
 };
 
@@ -94,6 +93,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#ffff',
   },
   header: {
     marginBottom: 20,
@@ -101,12 +101,12 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#ff3952',
   },
   role: {
     fontSize: 14,
-    color: '#ffe5e5',
-    opacity: 0.8,
+    color: '#ff3952',
+    opacity: 0.5,
   },
   card: {
     backgroundColor: '#fff',
@@ -115,11 +115,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#ff3952',
+    // shadowColor: '#000',
+    // shadowOffset: {width: 0, height: 4},
+    // shadowOpacity: 0.2,
+    // shadowRadius: 5,
+    // elevation: 5,
   },
   cardContent: {
     flex: 1,
@@ -151,11 +153,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
   },
   menuIcon: {
     width: 50,
@@ -168,7 +165,7 @@ const styles = StyleSheet.create({
     color: '#ff3952',
   },
   logoutButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ff3952',
     borderRadius: 20,
     alignItems: 'center',
     paddingVertical: 15,
@@ -180,7 +177,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   logoutText: {
-    color: '#ff3952',
+    color: '#ffff',
     fontWeight: 'bold',
     fontSize: 16,
   },

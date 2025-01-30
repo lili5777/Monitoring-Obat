@@ -46,6 +46,15 @@ const Obat = () => {
         console.error('Error fetching obat data:', error);
         setLoading(false);
       });
+
+    fetch('http://10.0.2.2:8000/api/rak')
+      .then(response => response.json())
+      .then(data => {
+        setRakData(data.data || []);
+      })
+      .catch(error => {
+        console.error('Error fetching rak data:', error);
+      });
   }, []);
 
   const handleAddObat = () => {
@@ -217,24 +226,28 @@ const Obat = () => {
           data={obatData}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item}) => (
-            <View style={styles.listt}>
-              <View style={styles.tekss}>
-                <Text style={styles.cardTitle}>Kode : {item.kode}</Text>
-                <Text style={styles.cardSubtitle}>Nama : {item.nama_obat}</Text>
-              </View>
-              <View style={styles.buttons}>
-                <TouchableOpacity
+            <Card style={styles.card}>
+              <Card.Content>
+                <Text style={styles.cardTitle}>Nama Obat: {item.nama}</Text>
+                <Text style={styles.cardSubtitle}>Jumlah: {item.jumlah}</Text>
+                <Text style={styles.cardSubtitle}>
+                  Kadaluarsa: {item.kadaluarsa}
+                </Text>
+                <Text style={styles.cardSubtitle}>Rak: {item.rak}</Text>
+                <Button
+                  mode="contained"
                   onPress={() => openEditModal(item)}
-                  style={styles.button}>
-                  <Text style={styles.buttonText}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => openEditModal(item)}
-                  style={[styles.button, {backgroundColor: '#dc3545'}]}>
-                  <Text style={styles.buttonText}>Hapus</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+                  style={styles.editButton}>
+                  Edit
+                </Button>
+                <Button
+                  mode="contained"
+                  onPress={() => handleDeleteObat(item.id)}
+                  style={styles.deleteButton}>
+                  Hapus
+                </Button>
+              </Card.Content>
+            </Card>
           )}
         />
       )}
@@ -393,8 +406,8 @@ const Obat = () => {
 };
 
 const styles = StyleSheet.create({
-  // picker: {borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10},
-  // selectContainer: {margin: 10},
+  picker: {borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10},
+  selectContainer: {margin: 10},
   container: {
     flex: 1,
     padding: 20,
@@ -417,46 +430,112 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 10,
   },
-  listt: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+  editButton: {
+    backgroundColor: '#4CAF50',
+    flex: 1,
+    marginRight: 5,
   },
-  tekss: {
-    flex: 0.7,
-  },
-  buttons: {
-    flexDirection: 'row',
-    flex: 0.3,
-    justifyContent: 'flex-end',
-  },
-  button: {
-    marginHorizontal: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: '#666',
+  deleteButton: {
+    backgroundColor: '#f44336',
+    flex: 1,
+    marginLeft: 5,
   },
   addButtonText: {
     color: '#ff3952',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  card: {
+    marginBottom: 15,
+    backgroundColor: '#ffe5e5',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    borderRadius: 12,
+    padding: 15,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ff3952',
+    marginBottom: 5,
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: '#757575',
+  },
+  button: {
+    marginTop: 20,
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    alignItems: 'center',
+  },
+  buttonLabel: {
+    color: '#ff3952',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#ff3952',
+    textAlign: 'center',
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#cccccc',
+    marginBottom: 15,
+    paddingVertical: 5,
+    fontSize: 16,
+  },
+  selectLabel: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  selectItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#cccccc',
+  },
+  selectedItem: {
+    color: '#ff3952',
+    fontWeight: 'bold',
+  },
+  unselectedItem: {
+    color: '#000000',
+  },
+  submitButton: {
+    backgroundColor: '#ff3952',
+    marginBottom: 10,
   },
 });
 
