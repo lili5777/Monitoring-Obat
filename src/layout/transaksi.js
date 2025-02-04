@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {ActivityIndicator, Button} from 'react-native-paper';
+import {Picker} from '@react-native-picker/picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const Transaksi = ({route}) => {
   const {id} = route.params;
@@ -25,6 +27,8 @@ const Transaksi = ({route}) => {
   const [jumlah, setJumlah] = useState('');
   const [masuk, setMasuk] = useState('');
   const [kadaluarsa, setKadaluarsa] = useState('');
+  const [openMasuk, setOpenMasuk] = useState(false);
+  const [openKadaluarsa, setOpenKadaluarsa] = useState(false);
 
   useEffect(() => {
     fetch(`http://10.0.2.2:8000/api/obat/transaksi/${id}`)
@@ -88,6 +92,21 @@ const Transaksi = ({route}) => {
         console.error('Error adding obat:', error);
         Alert.alert('Error', 'Terjadi kesalahan saat menambahkan obat!');
       });
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || kadaluarsa;
+    setOpenKadaluarsa(false);
+    if (event.type === 'set') {
+      setKadaluarsa(currentDate.toISOString().split('T')[0]);
+    }
+  };
+  const onDateChange2 = (event, selectedDate) => {
+    const currentDate = selectedDate || masuk;
+    setOpenMasuk(false);
+    if (event.type === 'set') {
+      setMasuk(currentDate.toISOString().split('T')[0]);
+    }
   };
 
   return (
@@ -159,16 +178,54 @@ const Transaksi = ({route}) => {
               <Text style={styles.modalTitle}>Tambah Obat</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Kode Obat"
+                placeholder="Rak"
                 value={idrak}
                 onChangeText={setIdrak}
               />
               <TextInput
                 style={styles.input}
-                placeholder="Nama Obat"
-                value={idobat}
-                onChangeText={setIdobat}
+                placeholder="Jumlah"
+                value={jumlah}
+                onChangeText={setJumlah}
+                keyboardType="numeric"
               />
+
+              <TouchableOpacity
+                onPress={() => setOpenMasuk(true)}
+                style={styles.inputDate}>
+                <Text
+                  style={masuk ? styles.dateSelected : styles.datePlaceholder}>
+                  {masuk || 'Tanggal Masuk'}
+                </Text>
+              </TouchableOpacity>
+              {openMasuk && (
+                <DateTimePicker
+                  value={masuk ? new Date(masuk) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange2}
+                />
+              )}
+
+              <TouchableOpacity
+                onPress={() => setOpenKadaluarsa(true)}
+                style={styles.inputDate}>
+                <Text
+                  style={
+                    kadaluarsa ? styles.dateSelected : styles.datePlaceholder
+                  }>
+                  {kadaluarsa || 'Tanggal Kadaluarsa'}
+                </Text>
+              </TouchableOpacity>
+              {openKadaluarsa && (
+                <DateTimePicker
+                  value={kadaluarsa ? new Date(kadaluarsa) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                />
+              )}
+
               <Button
                 mode="contained"
                 onPress={handleAddObat}
@@ -343,9 +400,19 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
   },
+  inputDate: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
   submitButton: {
     marginTop: 10,
     backgroundColor: '#ff3952', // Adjust the color as needed
+  },
+  datePlaceholder: {
+    color: 'grey',
   },
 });
 
