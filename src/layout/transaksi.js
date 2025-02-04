@@ -19,6 +19,12 @@ const Transaksi = ({route}) => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const [transaksiData, setTransaksiData] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [idobat, setIdobat] = useState('');
+  const [idrak, setIdrak] = useState('');
+  const [jumlah, setJumlah] = useState('');
+  const [masuk, setMasuk] = useState('');
+  const [kadaluarsa, setKadaluarsa] = useState('');
 
   useEffect(() => {
     fetch(`http://10.0.2.2:8000/api/obat/transaksi/${id}`)
@@ -33,6 +39,56 @@ const Transaksi = ({route}) => {
         setLoading(false);
       });
   }, [id]);
+
+  const handleAddObat = () => {
+    if (!idrak || !jumlah || !masuk || !kadaluarsa) {
+      Alert.alert('Error', 'Semua field harus diisi!');
+      return;
+    }
+
+    const newObat = {
+      idrak: idrak,
+      idobat: idobat,
+      jumlah: jumlah,
+      masuk: masuk,
+      kadaluarsa: kadaluarsa,
+    };
+
+    fetch('http://10.0.2.2:8000/api/tambahtransaksi', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newObat),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const obatBaru = {
+            idrak: data.data.idrak,
+            idobat: data.data.idobat,
+            jumlah: data.data.jumlah,
+            masuk: data.data.masuk,
+            kadaluarsa: data.data.kadaluarsa,
+          };
+          // totoal
+          setKadaluarsa(data.kadaluarsa || []);
+          setTransaksiData(prevData => [...prevData, obatBaru]);
+          setModalVisible(false);
+          setIdrak('');
+          setIdobat('');
+          setJumlah('');
+          setMasuk('');
+          Alert.alert('Success', 'Obat berhasil ditambahkan!');
+        } else {
+          Alert.alert('Error', data.message || 'Gagal menambahkan obat!');
+        }
+      })
+      .catch(error => {
+        console.error('Error adding obat:', error);
+        Alert.alert('Error', 'Terjadi kesalahan saat menambahkan obat!');
+      });
+  };
 
   return (
     <View style={styles.container}>
@@ -50,7 +106,7 @@ const Transaksi = ({route}) => {
         </View>
       </View>
       <TouchableOpacity
-        // onPress={() => setModalVisible(true)}
+        onPress={() => setModalVisible(true)}
         style={styles.addButton}>
         <Text style={styles.addButtonText}>Tambah Obat</Text>
       </TouchableOpacity>
@@ -92,40 +148,40 @@ const Transaksi = ({route}) => {
         <Text style={styles.buttonLabel}>Kembali ke Obat</Text>
       </TouchableOpacity>
 
-      {/* <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}>
-                <View style={styles.modalOverlay}>
-                  <View style={styles.modalContent}>
-                    <KeyboardAvoidingView>
-                      <Text style={styles.modalTitle}>Tambah Obat</Text>
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Kode Obat"
-                        value={kodeObat}
-                        onChangeText={setKodeObat}
-                      />
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Nama Obat"
-                        value={namaObat}
-                        onChangeText={setNamaObat}
-                      />
-                      <Button
-                        mode="contained"
-                        onPress={handleAddObat}
-                        style={styles.submitButton}>
-                        Simpan
-                      </Button>
-                      <Button mode="text" onPress={() => setModalVisible(false)}>
-                        Batal
-                      </Button>
-                    </KeyboardAvoidingView>
-                  </View>
-                </View>
-              </Modal> */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <KeyboardAvoidingView>
+              <Text style={styles.modalTitle}>Tambah Obat</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Kode Obat"
+                value={idrak}
+                onChangeText={setIdrak}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Nama Obat"
+                value={idobat}
+                onChangeText={setIdobat}
+              />
+              <Button
+                mode="contained"
+                onPress={handleAddObat}
+                style={styles.submitButton}>
+                Simpan
+              </Button>
+              <Button mode="text" onPress={() => setModalVisible(false)}>
+                Batal
+              </Button>
+            </KeyboardAvoidingView>
+          </View>
+        </View>
+      </Modal>
 
       {/* <Modal
                 animationType="slide"
