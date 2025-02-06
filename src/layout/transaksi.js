@@ -24,6 +24,7 @@ const Transaksi = ({route}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [idobat, setIdobat] = useState('');
   const [idrak, setIdrak] = useState('');
+  const [rakData, setRakData] = useState([]);
   const [jumlah, setJumlah] = useState('');
   const [masuk, setMasuk] = useState('');
   const [kadaluarsa, setKadaluarsa] = useState('');
@@ -42,6 +43,15 @@ const Transaksi = ({route}) => {
         console.error('Error fetching obat data:', error);
         setLoading(false);
       });
+
+    fetch('http://10.0.2.2:8000/api/rak')
+      .then(response => response.json())
+      .then(data => {
+        setRakData(data.data || []);
+      })
+      .catch(error => {
+        console.error('Error fetching rak data:', error);
+      });
   }, [id]);
 
   const handleAddObat = () => {
@@ -52,11 +62,12 @@ const Transaksi = ({route}) => {
 
     const newObat = {
       idrak: idrak,
-      idobat: idobat,
+      idobat: id,
       jumlah: jumlah,
       masuk: masuk,
       kadaluarsa: kadaluarsa,
     };
+    console.log('Data yang dikirim:', newObat);
 
     fetch('http://10.0.2.2:8000/api/tambahtransaksi', {
       method: 'POST',
@@ -67,22 +78,23 @@ const Transaksi = ({route}) => {
     })
       .then(response => response.json())
       .then(data => {
+        console.log('Response dari API:', data);
         if (data.success) {
           const obatBaru = {
-            idrak: data.data.idrak,
-            idobat: data.data.idobat,
+            rak: data.data.rak,
+            obat: data.data.obat,
             jumlah: data.data.jumlah,
             masuk: data.data.masuk,
             kadaluarsa: data.data.kadaluarsa,
           };
-          // totoal
-          setKadaluarsa(data.kadaluarsa || []);
+
           setTransaksiData(prevData => [...prevData, obatBaru]);
           setModalVisible(false);
           setIdrak('');
           setIdobat('');
           setJumlah('');
           setMasuk('');
+          setKadaluarsa('');
           Alert.alert('Success', 'Obat berhasil ditambahkan!');
         } else {
           Alert.alert('Error', data.message || 'Gagal menambahkan obat!');
@@ -141,7 +153,9 @@ const Transaksi = ({route}) => {
               <View style={styles.listt}>
                 <View style={styles.tekss}>
                   <Text style={styles.cardTitle}>Rak : {item.rak}</Text>
-                  <Text style={styles.cardSubtitle}>Obat : {item.obat}</Text>
+                  <Text>Jumlah: {item.jumlah}</Text>
+                  <Text>Masuk: {item.masuk}</Text>
+                  <Text>Kadaluarsa: {item.kadaluarsa}</Text>
                 </View>
                 <View style={styles.buttons}>
                   <TouchableOpacity
@@ -176,12 +190,21 @@ const Transaksi = ({route}) => {
           <View style={styles.modalContent}>
             <KeyboardAvoidingView>
               <Text style={styles.modalTitle}>Tambah Obat</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Rak"
-                value={idrak}
-                onChangeText={setIdrak}
-              />
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={idrak}
+                  onValueChange={itemValue => setIdrak(itemValue)}
+                  style={styles.picker}>
+                  <Picker.Item label="Pilih Rak" value="" />
+                  {rakData.map(rak => (
+                    <Picker.Item
+                      key={rak.id}
+                      label={rak.nama_rak}
+                      value={rak.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
               <TextInput
                 style={styles.input}
                 placeholder="Jumlah"
@@ -398,6 +421,8 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
+    paddingTop: 15,
+    paddingBottom: 15,
     marginBottom: 15,
   },
   inputDate: {
@@ -406,6 +431,21 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,
+    paddingTop: 15,
+    paddingBottom: 15,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginBottom: 15,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    backgroundColor: 'white',
+    paddingHorizontal: 10,
+    color: 'grey',
   },
   submitButton: {
     marginTop: 10,

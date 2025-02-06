@@ -208,6 +208,7 @@ const Obat = () => {
       setKadaluarsa(currentDate.toISOString().split('T')[0]);
     }
   };
+ 
 
   return (
     <LinearGradient colors={['#ff3952', '#ffff']} style={styles.container}>
