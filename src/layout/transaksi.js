@@ -121,6 +121,47 @@ const Transaksi = ({route}) => {
     }
   };
 
+  const handleDeleteObat = id => {
+    Alert.alert(
+      'Konfirmasi Hapus',
+      'Apakah Anda yakin ingin menghapus obat ini?',
+      [
+        {
+          text: 'Batal',
+          style: 'cancel',
+        },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: () => {
+            fetch(`http://10.0.2.2:8000/api/hapustransaksi/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  setTransaksiData(prevData =>
+                    prevData.filter(item => item.id !== id),
+                  );
+                  Alert.alert('Success', 'Obat berhasil dihapus!');
+                } else {
+                  Alert.alert('Error', data.message || 'Gagal menghapus obat!');
+                }
+              })
+              .catch(error => {
+                console.error('Error deleting obat:', error);
+                Alert.alert('Error', 'Terjadi kesalahan saat menghapus obat!');
+              });
+          },
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.head}>
@@ -164,7 +205,7 @@ const Transaksi = ({route}) => {
                     <Text style={styles.buttonText}>Edit</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    // onPress={() => handleDeleteObat(item.id)}
+                    onPress={() => handleDeleteObat(item.id)}
                     style={[styles.buttonn, {backgroundColor: '#dc3545'}]}>
                     <Text style={styles.buttonText}>Hapus</Text>
                   </TouchableOpacity>
