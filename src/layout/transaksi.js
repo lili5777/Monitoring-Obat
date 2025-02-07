@@ -30,6 +30,13 @@ const Transaksi = ({route}) => {
   const [kadaluarsa, setKadaluarsa] = useState('');
   const [openMasuk, setOpenMasuk] = useState(false);
   const [openKadaluarsa, setOpenKadaluarsa] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editTransaksiId, setEditTransaksiId] = useState(null);
+  const [editIdRak, setEditIdRak] = useState('');
+  const [editjumlah, editsetJumlah] = useState('');
+  const [editmasuk, editsetMasuk] = useState('');
+  const [editkadaluarsa, editsetKadaluarsa] = useState('');
+  const [editidobat, editsetIdobat] = useState('');
 
   useEffect(() => {
     fetch(`http://10.0.2.2:8000/api/obat/transaksi/${id}`)
@@ -142,6 +149,7 @@ const Transaksi = ({route}) => {
             })
               .then(response => response.json())
               .then(data => {
+                console.log('Response dari API:', data);
                 if (data.success) {
                   setTransaksiData(prevData =>
                     prevData.filter(item => item.id !== id),
@@ -160,6 +168,67 @@ const Transaksi = ({route}) => {
       ],
       {cancelable: true},
     );
+  };
+
+  const openEditModal = item => {
+    setEditTransaksiId(item.id);
+    editsetIdobat(id);
+    editsetJumlah(item.jumlah.toString());
+    editsetKadaluarsa(item.kadaluarsa);
+    editsetMasuk(item.masuk);
+    setEditIdRak(rakData.find(rak => rak.nama_rak === item.rak)?.id || '');
+    setEditModalVisible(true);
+  };
+
+  const handleUpdateObat = () => {
+    if (!editjumlah || !editkadaluarsa || !editmasuk || !editIdRak) {
+      Alert.alert('Error', 'Semua field harus diisi!');
+      return;
+    }
+
+    const updatetransaksi = {
+      idrak: editIdRak,
+      idobat: id,
+      jumlah: editjumlah,
+      masuk: new Date(editmasuk).toISOString().split('T')[0], // Format YYYY-MM-DD
+      kadaluarsa: new Date(editkadaluarsa).toISOString().split('T')[0],
+    };
+    console.log('Data yang dikirim:', updatetransaksi);
+
+    fetch(`http://10.0.2.2:8000/api/edittransaksi/${editTransaksiId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatetransaksi),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Data yang ditambah:', data);
+        if (data.success) {
+          const updatedData = transaksiData.map(item =>
+            item.id === editTransaksiId
+              ? {
+                  ...item,
+                  obat: data.data.obat,
+                  jumlah: data.data.jumlah,
+                  kadaluarsa: data.data.kadaluarsa,
+                  rak: data.data.rak,
+                  masuk: data.data.masuk,
+                }
+              : item,
+          );
+          setTransaksiData(updatedData);
+          setEditModalVisible(false);
+          Alert.alert('Success', 'Transaksi berhasil diperbarui!');
+        } else {
+          Alert.alert('Error', data.message || 'Gagal memperbarui Transaksi!');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating obat:', error);
+        Alert.alert('Error', 'Terjadi kesalahan saat memperbarui Transaksi!');
+      });
   };
 
   return (
@@ -200,7 +269,7 @@ const Transaksi = ({route}) => {
                 </View>
                 <View style={styles.buttons}>
                   <TouchableOpacity
-                    // onPress={() => openEditModal(item)}
+                    onPress={() => openEditModal(item)}
                     style={styles.buttonn}>
                     <Text style={styles.buttonText}>Edit</Text>
                   </TouchableOpacity>
@@ -304,6 +373,107 @@ const Transaksi = ({route}) => {
         </View>
       </Modal>
 
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={editModalVisible}
+        onRequestClose={() => setEditModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <KeyboardAvoidingView>
+              <Text style={styles.modalTitle}>Tambah Obat</Text>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={editIdRak}
+                  onValueChange={itemValue => setEditIdRak(itemValue)}
+                  style={styles.picker}>
+                  <Picker.Item label="Pilih Rak" value="" />
+                  {rakData.map(rak => (
+                    <Picker.Item
+                      key={rak.id}
+                      label={rak.nama_rak}
+                      value={rak.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Jumlah"
+                value={editjumlah}
+                onChangeText={editsetJumlah}
+                keyboardType="numeric"
+              />
+
+              <TouchableOpacity
+                onPress={() => setOpenMasuk(true)}
+                style={styles.inputDate}>
+                <Text
+                  style={
+                    editmasuk ? styles.dateSelected : styles.datePlaceholder
+                  }>
+                  {editmasuk || 'Tanggal Masuk'}
+                </Text>
+              </TouchableOpacity>
+              {openMasuk && (
+                <DateTimePicker
+                  value={editmasuk ? new Date(editmasuk) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    if (event.type === 'set' && selectedDate) {
+                      const formattedDate = selectedDate
+                        .toISOString()
+                        .split('T')[0];
+                      editsetMasuk(formattedDate);
+                    }
+                    setOpenMasuk(false);
+                  }}
+                />
+              )}
+
+              <TouchableOpacity
+                onPress={() => setOpenKadaluarsa(true)}
+                style={styles.inputDate}>
+                <Text
+                  style={
+                    editkadaluarsa
+                      ? styles.dateSelected
+                      : styles.datePlaceholder
+                  }>
+                  {editkadaluarsa || 'Tanggal Kadaluarsa'}
+                </Text>
+              </TouchableOpacity>
+              {openKadaluarsa && (
+                <DateTimePicker
+                  value={editkadaluarsa ? new Date(editkadaluarsa) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    if (event.type === 'set' && selectedDate) {
+                      const formattedDate = selectedDate
+                        .toISOString()
+                        .split('T')[0];
+                      editsetKadaluarsa(formattedDate);
+                    }
+                    setOpenKadaluarsa(false);
+                  }}
+                />
+              )}
+
+              <Button
+                mode="contained"
+                onPress={handleUpdateObat}
+                style={styles.submitButton}>
+                Simpan
+              </Button>
+              <Button mode="text" onPress={() => setEditModalVisible(false)}>
+                Batal
+              </Button>
+            </KeyboardAvoidingView>
+          </View>
+        </View>
+      </Modal>
       {/* <Modal
                 animationType="slide"
                 transparent={true}
