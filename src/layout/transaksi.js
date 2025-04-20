@@ -39,11 +39,11 @@ const Transaksi = ({route}) => {
   const [editidobat, editsetIdobat] = useState('');
 
   useEffect(() => {
-    fetch(`https://monitoring.dipalji.com/api/obat/transaksi/${id}`)
+    fetch(`http://10.0.2.2:8000/api/obat/transaksi/${id}`)
       .then(response => response.json())
       .then(data => {
         console.log('Data dari API:', data);
-        setTransaksiData(data.transaksi || []); // Pastikan key-nya 'transaksi'
+        setTransaksiData(data.transaksi || []); 
         setLoading(false);
       })
       .catch(error => {
@@ -51,7 +51,7 @@ const Transaksi = ({route}) => {
         setLoading(false);
       });
 
-    fetch('https://monitoring.dipalji.com/api/rak')
+    fetch('http://10.0.2.2:8000/api/rak')
       .then(response => response.json())
       .then(data => {
         setRakData(data.data || []);
@@ -76,40 +76,46 @@ const Transaksi = ({route}) => {
     };
     console.log('Data yang dikirim:', newObat);
 
-    fetch('https://monitoring.dipalji.com/tambahtransaksi', {
+    fetch('http://10.0.2.2:8000/api/tambahtransaksi', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(newObat),
     })
-      .then(response => response.json())
+      .then(response => response.json()) 
       .then(data => {
-        console.log('Response dari API:', data);
-        if (data.success) {
-          const obatBaru = {
-            rak: data.data.rak,
-            obat: data.data.obat,
-            jumlah: data.data.jumlah,
-            masuk: data.data.masuk,
-            kadaluarsa: data.data.kadaluarsa,
-          };
+        try {
 
-          setTransaksiData(prevData => [...prevData, obatBaru]);
-          setModalVisible(false);
-          setIdrak('');
-          setIdobat('');
-          setJumlah('');
-          setMasuk('');
-          setKadaluarsa('');
-          Alert.alert('Success', 'Obat berhasil ditambahkan!');
-        } else {
-          Alert.alert('Error', data.message || 'Gagal menambahkan obat!');
+          if (data.success) {
+            const obatBaru = {
+              id: data.data.id,
+              rak: data.data.rak,
+              obat: data.data.obat,
+              jumlah: data.data.jumlah,
+              masuk: data.data.masuk,
+              kadaluarsa: data.data.kadaluarsa,
+            };
+
+            setTransaksiData(prevData => [...prevData, obatBaru]);
+            setModalVisible(false);
+            setIdrak('');
+            setIdobat('');
+            setJumlah('');
+            setMasuk('');
+            setKadaluarsa('');
+            Alert.alert('Success', 'Obat berhasil ditambahkan!');
+          } else {
+            Alert.alert('Error', data.message || 'Gagal menambahkan obat!');
+          }
+        } catch (e) {
+          console.error('Gagal parsing JSON:', e.message);
+          Alert.alert('Error', 'Respons bukan JSON. Cek console log.');
         }
       })
       .catch(error => {
-        console.error('Error adding obat:', error);
-        Alert.alert('Error', 'Terjadi kesalahan saat menambahkan obat!');
+        console.error('Error saat mengirim data:', error);
+        Alert.alert('Error', 'Terjadi kesalahan saat mengirim data!');
       });
   };
 
@@ -141,7 +147,7 @@ const Transaksi = ({route}) => {
           text: 'Hapus',
           style: 'destructive',
           onPress: () => {
-            fetch(`https://monitoring.dipalji.com/api/hapustransaksi/${id}`, {
+            fetch(`http://10.0.2.2:8000/api/hapustransaksi/${id}`, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
@@ -195,16 +201,13 @@ const Transaksi = ({route}) => {
     };
     console.log('Data yang dikirim:', updatetransaksi);
 
-    fetch(
-      `https://monitoring.dipalji.com/api/edittransaksi/${editTransaksiId}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatetransaksi),
+    fetch(`http://10.0.2.2:8000/api/edittransaksi/${editTransaksiId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+      body: JSON.stringify(updatetransaksi),
+    })
       .then(response => response.json())
       .then(data => {
         console.log('Data yang ditambah:', data);

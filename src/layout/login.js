@@ -23,13 +23,10 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(
-        'https://monitoring.dipalji.com/api/login',
-        {
-          username: username,
-          password: password,
-        },
-      );
+      const response = await axios.post('http://10.0.2.2:8000/api/login', {
+        username: username,
+        password: password,
+      });
       if (response.status === 200) {
         await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
         navigation.navigate(Home);

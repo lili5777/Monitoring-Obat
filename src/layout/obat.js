@@ -29,7 +29,7 @@ const Obat = () => {
   const [editKodeObat, setEditKodeObat] = useState('');
 
   useEffect(() => {
-    fetch('https://monitoring.dipalji.com/api/obat')
+    fetch('http://10.0.2.2:8000/api/obat')
       .then(response => response.json())
       .then(data => {
         setObatData(data.obat || []);
@@ -54,7 +54,7 @@ const Obat = () => {
       kode: kodeObat,
     };
 
-    fetch('https://monitoring.dipalji.com/api/storeobat', {
+    fetch('http://10.0.2.2:8000/api/storeobat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const Obat = () => {
       kode: editKodeObat,
     };
 
-    fetch(`https://monitoring.dipalji.com/api/updateobat/${editObatId}`, {
+    fetch(`http://10.0.2.2:8000/api/updateobat/${editObatId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ const Obat = () => {
           text: 'Hapus',
           style: 'destructive',
           onPress: () => {
-            fetch(`https://monitoring.dipalji.com/api/deleteobat/${id}`, {
+            fetch(`http://10.0.2.2:8000/api/deleteobat/${id}`, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
