@@ -39,7 +39,7 @@ const Transaksi = ({route}) => {
   const [editidobat, editsetIdobat] = useState('');
 
   useEffect(() => {
-    fetch(`http://10.0.2.2:8000/api/obat/transaksi/${id}`)
+    fetch(`https://monitoring.dipalji.com/api/obat/transaksi/${id}`)
       .then(response => response.json())
       .then(data => {
         console.log('Data dari API:', data);
@@ -51,7 +51,7 @@ const Transaksi = ({route}) => {
         setLoading(false);
       });
 
-    fetch('http://10.0.2.2:8000/api/rak')
+    fetch('https://monitoring.dipalji.com/api/rak')
       .then(response => response.json())
       .then(data => {
         setRakData(data.data || []);
@@ -76,7 +76,7 @@ const Transaksi = ({route}) => {
     };
     console.log('Data yang dikirim:', newObat);
 
-    fetch('http://10.0.2.2:8000/api/tambahtransaksi', {
+    fetch('https://monitoring.dipalji.com/tambahtransaksi', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ const Transaksi = ({route}) => {
           text: 'Hapus',
           style: 'destructive',
           onPress: () => {
-            fetch(`http://10.0.2.2:8000/api/hapustransaksi/${id}`, {
+            fetch(`https://monitoring.dipalji.com/api/hapustransaksi/${id}`, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
@@ -190,18 +190,21 @@ const Transaksi = ({route}) => {
       idrak: editIdRak,
       idobat: id,
       jumlah: editjumlah,
-      masuk: new Date(editmasuk).toISOString().split('T')[0], // Format YYYY-MM-DD
+      masuk: new Date(editmasuk).toISOString().split('T')[0],
       kadaluarsa: new Date(editkadaluarsa).toISOString().split('T')[0],
     };
     console.log('Data yang dikirim:', updatetransaksi);
 
-    fetch(`http://10.0.2.2:8000/api/edittransaksi/${editTransaksiId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
+    fetch(
+      `https://monitoring.dipalji.com/api/edittransaksi/${editTransaksiId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatetransaksi),
       },
-      body: JSON.stringify(updatetransaksi),
-    })
+    )
       .then(response => response.json())
       .then(data => {
         console.log('Data yang ditambah:', data);

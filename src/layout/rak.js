@@ -10,7 +10,7 @@ const Rak = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/api/rak') // Ganti dengan URL backend Anda
+    fetch('https://monitoring.dipalji.com/api/rak') // Ganti dengan URL backend Anda
       .then(response => response.json())
       .then(data => {
         setRakData(data.data); // Ambil data rak dari response
