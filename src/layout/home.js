@@ -34,6 +34,9 @@ const Home = () => {
   const handleProfil = async () => {
     navigation.navigate('Profil'); // Arahkan ke halaman login
   };
+  const handleArima = async () => {
+    navigation.navigate('Arima'); // Arahkan ke halaman login
+  };
 
   return (
     <View style={styles.container}>
@@ -73,12 +76,12 @@ const Home = () => {
           />
           <Text style={styles.menuText}>Riwayat</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={handleProfil}>
+        <TouchableOpacity style={styles.menuItem} onPress={handleArima}>
           <Image
             source={require('../img/profile.png')}
             style={styles.menuIcon}
           />
-          <Text style={styles.menuText}>Profile</Text>
+          <Text style={styles.menuText}>Forcasting</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

@@ -9,6 +9,7 @@ import Profil from './src/layout/profil';
 import Obat from './src/layout/obat';
 import Riwayat from './src/layout/riwayat';
 import Transaksi from './src/layout/transaksi';
+import Arima from './src/layout/arima';
 
 const Stack = createStackNavigator();
 
@@ -26,6 +27,7 @@ const App = () => {
         <Stack.Screen name="Obat" component={Obat} />
         <Stack.Screen name="Riwayat" component={Riwayat} />
         <Stack.Screen name="Transaksi" component={Transaksi} />
+        <Stack.Screen name="Arima" component={Arima} />
       </Stack.Navigator>
     </NavigationContainer>
   );
