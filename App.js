@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import SplashScreen from './src/layout/splash';
@@ -10,6 +10,7 @@ import Obat from './src/layout/obat';
 import Riwayat from './src/layout/riwayat';
 import Transaksi from './src/layout/transaksi';
 import Arima from './src/layout/arima';
+import Prediksi from './src/layout/prediksi';
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,7 @@ const App = () => {
         <Stack.Screen name="Riwayat" component={Riwayat} />
         <Stack.Screen name="Transaksi" component={Transaksi} />
         <Stack.Screen name="Arima" component={Arima} />
+        <Stack.Screen name="Prediksi" component={Prediksi} />
       </Stack.Navigator>
     </NavigationContainer>
   );

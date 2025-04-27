@@ -1,11 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 // import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
+import notifikasi from '../Notifikasi';
 
 const Home = () => {
   const [user, setUser] = useState(null);
+  const [obatKadaluarsa, setObatKadaluarsa] = useState([]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -13,9 +22,77 @@ const Home = () => {
       if (userData) {
         setUser(JSON.parse(userData));
       }
+
+      // Ambil data obat kadaluarsa dari API
+      try {
+        const response = await fetch('http://10.0.2.2:8000/api/notifikasi');
+        const data = await response.json();
+        if (data.obat) {
+          setObatKadaluarsa(data.obat);
+          jadwalkanNotifikasiObat(data.obat);
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Gagal mengambil data obat kadaluarsa.');
+        console.error(error);
+      }
     };
     fetchUser();
   }, []);
+
+  const jadwalkanNotifikasiObat = async obatList => {
+    notifikasi.configure();
+    notifikasi.buatChannel('obat_kadaluarsa');
+
+    for (const obat of obatList) {
+      const {id, nama, tanggal_kadaluarsa, rak, jumlah} = obat;
+      const tanggalKadaluarsa = new Date(tanggal_kadaluarsa);
+      const pesan = `Obat ${nama} kadaluarsa. Lokasi: Rak ${rak}, Sisa: ${jumlah}`;
+
+      // Membuat ID unik dari ID obat dan tanggal kadaluarsa
+      const idNotifikasi = `obat_${id}_${tanggal_kadaluarsa}`;
+
+      // Menjadwalkan hanya jika belum pernah
+      const berhasilDijadwalkan = await notifikasi.jadwalkanNotifikasiJikaBelum(
+        'obat_kadaluarsa',
+        'Peringatan Kadaluarsa!',
+        pesan,
+        tanggalKadaluarsa,
+        idNotifikasi,
+      );
+
+      if (berhasilDijadwalkan) {
+        console.log(`Notifikasi dijadwalkan untuk ${nama}`);
+      } else {
+        console.log(`Notifikasi untuk ${nama} sudah pernah dijadwalkan`);
+      }
+    }
+  };
+
+  // const jadwalkanNotifikasiObat = obatList => {
+  //   notifikasi.configure();
+  //   notifikasi.buatChannel('obat_kadaluarsa');
+
+  //   obatList.forEach(obat => {
+  //     const {nama, tanggal_kadaluarsa, rak, jumlah} = obat;
+
+  //     // Untuk testing, gunakan waktu sekarang + 10 detik
+  //     const tanggalTesting = new Date(tanggal_kadaluarsa);
+
+  //     const pesan = `Obat ${nama} kadaluarsa. Lokasi: Rak ${rak}, Sisa: ${jumlah}`;
+
+  //     // Jadwalkan notifikasi untuk testing
+  //     notifikasi.jadwalkanNotifikasi(
+  //       'obat_kadaluarsa',
+  //       'Peringatan Kadaluarsa!',
+  //       pesan,
+  //       tanggalTesting,
+  //     );
+
+  //     console.log(
+  //       `Notifikasi  dijadwalkan untuk ${nama} pada ${tanggalTesting.toLocaleString()}`,
+  //     );
+  //   });
+  // };
 
   const navigation = useNavigation();
   const handleLogout = async () => {
@@ -36,6 +113,11 @@ const Home = () => {
   };
   const handleArima = async () => {
     navigation.navigate('Arima'); // Arahkan ke halaman login
+  };
+  const kliktombol = () => {
+    notifikasi.configure();
+    notifikasi.buatChannel('1');
+    notifikasi.kirimNotifikasi('1', 'ssss', 'aaaa');
   };
 
   return (
@@ -69,7 +151,7 @@ const Home = () => {
           />
           <Text style={styles.menuText}>Kelola Rak</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={handleRiwayat}>
+        <TouchableOpacity style={styles.menuItem} onPress={kliktombol}>
           <Image
             source={require('../img/expire.png')}
             style={styles.menuIcon}

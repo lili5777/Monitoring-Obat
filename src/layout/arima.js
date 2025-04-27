@@ -12,6 +12,9 @@ import {useNavigation} from '@react-navigation/native';
 
 const Arima = () => {
   const navigation = useNavigation();
+  const hendlePrediksi = async () => {
+    navigation.navigate('Prediksi'); // Arahkan ke halaman login
+  };
 
   const [loading, setLoading] = useState(true);
   const [obatKadaluarsa, setObatKadaluarsa] = useState([]);
@@ -43,7 +46,7 @@ const Arima = () => {
   return (
     <View style={styles.container}>
       <View style={styles.head}>
-        <Image source={require('../img/obat.png')} style={styles.obat} />
+        <Image source={require('../img/profile.png')} style={styles.obat} />
         <View style={{justifyContent: 'center', marginLeft: 10, gap: 5}}>
           <Text style={{color: '#fff'}}>
             Total Obat Kadaluarsa:{' '}
@@ -51,6 +54,9 @@ const Arima = () => {
           </Text>
         </View>
       </View>
+      <TouchableOpacity style={styles.addButton} onPress={hendlePrediksi}>
+        <Text style={styles.addButtonText}>Tekan Untuk Prediksi</Text>
+      </TouchableOpacity>
 
       {loading ? (
         <ActivityIndicator size="large" color="#ff3952" />
@@ -80,6 +86,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  addButton: {
+    backgroundColor: '#ffe5e5',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  addButtonText: {
+    color: '#ff3952',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   head: {
     flexDirection: 'row',
