@@ -25,11 +25,14 @@ const Home = () => {
 
       // Ambil data obat kadaluarsa dari API
       try {
-        const response = await fetch('http://10.0.2.2:8000/api/notifikasi');
+        const response = await fetch(
+          'https://monitoring.dipalji.com/api/notifikasi',
+        );
         const data = await response.json();
         if (data.obat) {
           setObatKadaluarsa(data.obat);
           jadwalkanNotifikasiObat(data.obat);
+          // resetNotifikasi();
         }
       } catch (error) {
         Alert.alert('Error', 'Gagal mengambil data obat kadaluarsa.');
@@ -45,7 +48,8 @@ const Home = () => {
 
     for (const obat of obatList) {
       const {id, nama, tanggal_kadaluarsa, rak, jumlah} = obat;
-      const tanggalKadaluarsa = new Date(tanggal_kadaluarsa);
+      let tanggalKadaluarsa = new Date(tanggal_kadaluarsa);
+      // tanggalKadaluarsa = new Date(Date.now() + 10000);
       const pesan = `Obat ${nama} kadaluarsa. Lokasi: Rak ${rak}, Sisa: ${jumlah}`;
 
       // Membuat ID unik dari ID obat dan tanggal kadaluarsa
@@ -64,8 +68,14 @@ const Home = () => {
         console.log(`Notifikasi dijadwalkan untuk ${nama}`);
       } else {
         console.log(`Notifikasi untuk ${nama} sudah pernah dijadwalkan`);
+        console.log(tanggalKadaluarsa);
       }
     }
+  };
+
+  const resetNotifikasi = async () => {
+    await notifikasi.resetNotifikasiTerkirim();
+    Alert.alert('Sukses', 'History notifikasi telah direset');
   };
 
   // const jadwalkanNotifikasiObat = obatList => {
@@ -97,7 +107,10 @@ const Home = () => {
   const navigation = useNavigation();
   const handleLogout = async () => {
     await AsyncStorage.removeItem('user');
-    navigation.navigate('Login'); // Arahkan ke halaman login
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Login'}],
+    });
   };
   const handleRak = async () => {
     navigation.navigate('Rak'); // Arahkan ke halaman login

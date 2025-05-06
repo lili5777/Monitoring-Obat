@@ -37,7 +37,7 @@ const Rak = () => {
       nama_rak: namaRak,
       kapasitas: kapasitas,
     };
-    fetch('http://10.0.2.2:8000/api/storerak', {
+    fetch('https://monitoring.dipalji.com/api/storerak', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ const Rak = () => {
       nama_rak: editNamaRak,
       kapasitas: editKapasitas,
     };
-    fetch(`http://10.0.2.2:8000/api/updaterak/${editId}`, {
+    fetch(`https://monitoring.dipalji.com/api/updaterak/${editId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ const Rak = () => {
               text: 'Hapus',
               style: 'destructive',
               onPress: () => {
-                fetch(`http://10.0.2.2:8000/api/deleterak/${id}`, {
+                fetch(`https://monitoring.dipalji.com/api/deleterak/${id}`, {
                   method: 'DELETE',
                   headers: {
                     'Content-Type': 'application/json',
@@ -165,7 +165,7 @@ const Rak = () => {
   };
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/api/rak') // Ganti dengan URL backend Anda
+    fetch('https://monitoring.dipalji.com/api/rak') // Ganti dengan URL backend Anda
       .then(response => response.json())
       .then(data => {
         setRakData(data.data); // Ambil data rak dari response

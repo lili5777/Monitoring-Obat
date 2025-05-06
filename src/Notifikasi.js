@@ -71,12 +71,11 @@ class Notifikasi {
   }
 
   // Reset riwayat notifikasi (untuk testing)
-  // async resetNotifikasiTerkirim() {
-  //   this.notifikasiTerkirim = new Set();
-  //   await AsyncStorage.removeItem('notifikasi_terkirim');
-  //   console.log('History notifikasi terkirim telah direset');
-  // }
-
+  async resetNotifikasiTerkirim() {
+    this.notifikasiTerkirim = new Set();
+    await AsyncStorage.removeItem('notifikasi_terkirim');
+    console.log('History notifikasi terkirim telah direset');
+  }
 
   configure = async () => {
     if (Platform.OS === 'android' && Platform.Version >= 33) {

@@ -23,16 +23,23 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://10.0.2.2:8000/api/login', {
-        username: username,
-        password: password,
-      });
-      if (response.status === 200) {
+      const response = await axios.post(
+        'https://monitoring.dipalji.com/api/login',
+        {
+          username: username,
+          password: password,
+        },
+      );
+      if (response.data && response.data.user) {
+        // Simpan data user ke AsyncStorage
         await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
-        navigation.navigate(Home);
+
+        // Navigasi ke Home setelah login berhasil
+        navigation.replace('Home'); // Gunakan replace agar tidak bisa kembali ke halaman login
       }
     } catch (error) {
       setModalVisible(true);
+      console.error('Login error:', error);
     }
   };
 

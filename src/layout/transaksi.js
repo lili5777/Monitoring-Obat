@@ -39,7 +39,7 @@ const Transaksi = ({route}) => {
   const [editidobat, editsetIdobat] = useState('');
 
   useEffect(() => {
-    fetch(`http://10.0.2.2:8000/api/obat/transaksi/${id}`)
+    fetch(`https://monitoring.dipalji.com/api/obat/transaksi/${id}`)
       .then(response => response.json())
       .then(data => {
         console.log('Data dari API:', data);
@@ -51,7 +51,7 @@ const Transaksi = ({route}) => {
         setLoading(false);
       });
 
-    fetch('http://10.0.2.2:8000/api/rak')
+    fetch('https://monitoring.dipalji.com/api/rak')
       .then(response => response.json())
       .then(data => {
         setRakData(data.data || []);
@@ -76,7 +76,7 @@ const Transaksi = ({route}) => {
     };
     console.log('Data yang dikirim:', newObat);
 
-    fetch('http://10.0.2.2:8000/api/tambahtransaksi', {
+    fetch('https://monitoring.dipalji.com/api/tambahtransaksi', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -147,7 +147,7 @@ const Transaksi = ({route}) => {
           text: 'Hapus',
           style: 'destructive',
           onPress: () => {
-            fetch(`http://10.0.2.2:8000/api/hapustransaksi/${id}`, {
+            fetch(`https://monitoring.dipalji.com/api/hapustransaksi/${id}`, {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
@@ -201,7 +201,7 @@ const Transaksi = ({route}) => {
     };
     console.log('Data yang dikirim:', updatetransaksi);
 
-    fetch(`http://10.0.2.2:8000/api/edittransaksi/${editTransaksiId}`, {
+    fetch(`https://monitoring.dipalji.com/api/edittransaksi/${editTransaksiId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

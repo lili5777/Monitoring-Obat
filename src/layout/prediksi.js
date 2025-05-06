@@ -15,7 +15,7 @@ const Prediksi = () => {
   const [dataPrediksi, setDataPrediksi] = useState(null);
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/api/prediksi')
+    fetch('https://monitoring.dipalji.com/api/prediksi')
       .then(response => response.json())
       .then(json => {
         setDataPrediksi(json);

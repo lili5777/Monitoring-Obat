@@ -20,7 +20,7 @@ const Arima = () => {
   const [obatKadaluarsa, setObatKadaluarsa] = useState([]);
 
   useEffect(() => {
-    fetch('http://10.0.2.2:8000/api/kadaluarsa') // Ganti dengan URL backend kamu
+    fetch('https://monitoring.dipalji.com/api/kadaluarsa') // Ganti dengan URL backend kamu
       .then(response => response.json())
       .then(json => {
         // Pastikan respons sesuai: [{ bulan: "September 2025", total: 30 }, ...]
