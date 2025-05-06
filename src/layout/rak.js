@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {Card, ActivityIndicator} from 'react-native-paper';
-import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Rak = () => {
   const [rakData, setRakData] = useState([]);
@@ -27,6 +27,7 @@ const Rak = () => {
   const [editNamaRak, setEditNamaRak] = useState('');
   const [editKapasitas, setEditKapasitas] = useState('');
   const [editId, setEditId] = useState(null);
+  const [userRole, setUserRole] = useState('');
 
   const handleAddRak = () => {
     if (!namaRak || !kapasitas) {
@@ -165,6 +166,15 @@ const Rak = () => {
   };
 
   useEffect(() => {
+    const getUserData = async () => {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUserRole(parsedUser.role); // Set role user
+      }
+    };
+    getUserData();
+
     fetch('https://monitoring.dipalji.com/api/rak') // Ganti dengan URL backend Anda
       .then(response => response.json())
       .then(data => {
@@ -191,11 +201,13 @@ const Rak = () => {
         </View>
       </View>
 
-      <TouchableOpacity
-        onPress={() => setModalVisible(true)}
-        style={styles.addButton}>
-        <Text style={styles.addButtonText}>Tambah Rak</Text>
-      </TouchableOpacity>
+      {userRole === 'admin' && (
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={styles.addButton}>
+          <Text style={styles.addButtonText}>Tambah Rak</Text>
+        </TouchableOpacity>
+      )}
 
       {loading ? (
         <ActivityIndicator animating={true} size="large" color="#fff" />
@@ -216,18 +228,23 @@ const Rak = () => {
                   <Text style={styles.cardSubtitle}>Terisi: {item.terisi}</Text>
                   <Text style={styles.cardSubtitle}>Kosong: {item.kosong}</Text>
                 </View>
-                <View style={styles.buttons}>
-                  <TouchableOpacity
-                    onPress={() => openEditModal(item)}
-                    style={styles.buttonAction}>
-                    <Text style={styles.buttonText}>Edit</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleDeleteRak(item.id)}
-                    style={[styles.buttonAction, {backgroundColor: '#dc3545'}]}>
-                    <Text style={styles.buttonText}>Hapus</Text>
-                  </TouchableOpacity>
-                </View>
+                {userRole === 'admin' && (
+                  <View style={styles.buttons}>
+                    <TouchableOpacity
+                      onPress={() => openEditModal(item)}
+                      style={styles.buttonAction}>
+                      <Text style={styles.buttonText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleDeleteRak(item.id)}
+                      style={[
+                        styles.buttonAction,
+                        {backgroundColor: '#dc3545'},
+                      ]}>
+                      <Text style={styles.buttonText}>Hapus</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             </TouchableOpacity>
           )}

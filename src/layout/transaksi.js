@@ -15,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 import {ActivityIndicator, Button} from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Transaksi = ({route}) => {
   const {id} = route.params;
@@ -37,8 +38,18 @@ const Transaksi = ({route}) => {
   const [editmasuk, editsetMasuk] = useState('');
   const [editkadaluarsa, editsetKadaluarsa] = useState('');
   const [editidobat, editsetIdobat] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
+    const getUserData = async () => {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUserRole(parsedUser.role); // Set role user
+      }
+    };
+    getUserData();
+
     fetch(`https://monitoring.dipalji.com/api/obat/transaksi/${id}`)
       .then(response => response.json())
       .then(data => {
@@ -252,11 +263,13 @@ const Transaksi = ({route}) => {
           </Text>
         </View>
       </View>
-      <TouchableOpacity
-        onPress={() => setModalVisible(true)}
-        style={styles.addButton}>
-        <Text style={styles.addButtonText}>Tambah Obat</Text>
-      </TouchableOpacity>
+      {userRole === 'admin' && (
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={styles.addButton}>
+          <Text style={styles.addButtonText}>Tambah Obat</Text>
+        </TouchableOpacity>
+      )}
 
       {loading ? (
         <ActivityIndicator animating={true} size="large" color="#ffff" />
@@ -273,18 +286,20 @@ const Transaksi = ({route}) => {
                   <Text>Masuk: {item.masuk}</Text>
                   <Text>Kadaluarsa: {item.kadaluarsa}</Text>
                 </View>
-                <View style={styles.buttons}>
-                  <TouchableOpacity
-                    onPress={() => openEditModal(item)}
-                    style={styles.buttonn}>
-                    <Text style={styles.buttonText}>Edit</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleDeleteObat(item.id)}
-                    style={[styles.buttonn, {backgroundColor: '#dc3545'}]}>
-                    <Text style={styles.buttonText}>Hapus</Text>
-                  </TouchableOpacity>
-                </View>
+                {userRole === 'admin' && (
+                  <View style={styles.buttons}>
+                    <TouchableOpacity
+                      onPress={() => openEditModal(item)}
+                      style={styles.buttonn}>
+                      <Text style={styles.buttonText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleDeleteObat(item.id)}
+                      style={[styles.buttonn, {backgroundColor: '#dc3545'}]}>
+                      <Text style={styles.buttonText}>Hapus</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             </TouchableOpacity>
           )}
